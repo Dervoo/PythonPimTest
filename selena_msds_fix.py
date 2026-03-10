@@ -17,8 +17,11 @@ print("Status: 0% produktów zablokowanych dla e-commerce.")
 
 # 2. Aktualizacja Bazy Danych SQLite
 conn = sqlite3.connect('pim_database.db')
-# Zaktualizujemy ceny na przykładowe (żeby nie było 0.0 w PIM)
+# Zaktualizujemy ceny na przykladowe (zeby nie bylo 0.0 w PIM)
 df['Price'] = 45.99 
+
+# --- WYMUSZONE SORTOWANIE PO SKU DLA PORZADKU W EXCELU ---
+df = df.sort_values(by='SKU')
 
 # Wgrywamy na czysto do SQL
 df.to_sql('Products_Temp', conn, if_exists='replace', index=False)
