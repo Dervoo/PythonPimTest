@@ -36,7 +36,11 @@ Zaprojektowałem strukturę bazy danych z podziałem na Produkty, Kategorie i Lo
 *   📁 **[data/](data/)**: Pliki Master Data i wizualizacje procesów.
 *   📁 **[reports/](reports/)**: Profesjonalne audyty PDF – gotowe do prezentacji zarządowi.
 *   📁 **[notebooks/](notebooks/)**: Pełna ścieżka logiczna czyszczenia danych (Jupyter).
-*   📊 **[Selena_Master_Data_FINAL.xlsx](Selena_Master_Data_FINAL.xlsx)**: Gotowy do weryfikacji arkusz Excel.
+
+### 🔍 Porównanie Arkuszy Excel (Kluczowy Dowód)
+Oto bezpośrednie zestawienie bazy danych **Przed** i **Po** mojej interwencji:
+1.  📉 **[Selena_Legacy_Data_INITIAL.xlsx](Selena_Legacy_Data_INITIAL.xlsx)**: Surowy eksport z ERP (Błędy, Duplikaty, Braki dokumentacji).
+2.  📈 **[Selena_Master_Data_FINAL.xlsx](Selena_Master_Data_FINAL.xlsx)**: Czysta baza Master Data (Zweryfikowana, Skonsolidowana, Gotowa do PIM).
 
 ---
 
