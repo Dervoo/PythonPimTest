@@ -20,9 +20,12 @@ df_cleaned = df.drop_duplicates(subset=['EAN'], keep='first')
 deduplicated_count = initial_count - len(df_cleaned)
 print(f"Skonsolidowano {deduplicated_count} duplikatów EAN (wybrano rekordy z dokumentacją).")
 
-# --- Dodatkowe czyszczenie techniczne ---
+# ... (reszta czyszczenia technicznego)
 df_cleaned['Product_Name'] = df_cleaned['Product_Name'].str.strip()
 df_cleaned['Blocked_for_E-commerce'] = df_cleaned['Safety_Sheet_URL'].isna() | (df_cleaned['Safety_Sheet_URL'] == '')
+
+# --- SORTOWANIE DLA PORZĄDKU (zgodnie z prośbą użytkownika) ---
+df_cleaned = df_cleaned.sort_values(by='SKU')
 
 # 2. Aktualizacja Bazy Danych SQLite (Relacyjna struktura)
 conn = sqlite3.connect('pim_database.db')
