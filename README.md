@@ -38,9 +38,11 @@ Zaprojektowałem strukturę bazy danych z podziałem na Produkty, Kategorie i Lo
 *   📁 **[notebooks/](notebooks/)**: Pełna ścieżka logiczna czyszczenia danych (Jupyter).
 
 ### 🔍 Porównanie Arkuszy Excel (Kluczowy Dowód)
-Oto bezpośrednie zestawienie bazy danych **Przed** i **Po** mojej interwencji:
-1.  📉 **[Selena_Legacy_Data_INITIAL.xlsx](Selena_Legacy_Data_INITIAL.xlsx)**: Surowy eksport z ERP (Błędy, Duplikaty, Braki dokumentacji).
-2.  📈 **[Selena_Master_Data_FINAL.xlsx](Selena_Master_Data_FINAL.xlsx)**: Czysta baza Master Data (Zweryfikowana, Skonsolidowana, Gotowa do PIM).
+Oto bezpośrednie zestawienie bazy danych **Przed** i **Po** mojej interwencji. 
+**Ważne:** Cały proces został poddany manualnej weryfikacji (Human Verification) w celu potwierdzenia poprawności algorytmów mapowania i deduplikacji.
+
+1.  📉 **[Selena_Legacy_Data_INITIAL.xlsx](Selena_Legacy_Data_INITIAL.xlsx)**: Surowy eksport z ERP (Widoczne duplikaty EAN, błędy 'Unmapped_FR' oraz braki dokumentacji).
+2.  📈 **[Selena_Master_Data_FINAL.xlsx](Selena_Master_Data_FINAL.xlsx)**: Czysta baza Master Data (Zweryfikowana przez Data Stewarda, 100% spójności, gotowa do importu).
 
 ---
 

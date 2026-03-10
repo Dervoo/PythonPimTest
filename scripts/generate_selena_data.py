@@ -9,43 +9,37 @@ def generate_selena_data():
     brands = ['Tytan Professional', 'Quilosa', 'Artelit']
     
     data = []
+    # Generujemy 10 unikalnych EAN-ów dla duplikatów
     duplicate_eans = [f'{random.randint(10**12, 10**13-1)}' for _ in range(10)]
     
-    for i in range(num_rows):
-        sku = f'SEL-{1000 + i}'
-        market = random.choice(markets)
-        brand = random.choice(brands)
-        
-        # Nazwa produktu
-        base_name = f"{brand} {random.choice(['Piana 65', 'Klej Fix2', 'Silikon Sanitarny'])}"
-        if market == 'FR':
-            product_name = f"Mousse {base_name}"
+    i = 0
+    while len(data) < num_rows:
+        # Generujemy pary duplikatów (pierwsze 20 rekordów to 10 par)
+        if i < 10:
+            ean = duplicate_eans[i]
+            # Rekord A
+            sku_a = f'SEL-{1000 + (i*2)}'
+            name_a = f"{random.choice(brands)} Piana 65"
+            data.append([sku_a, name_a, ean, 'PL', 25, f"https://selena.com/msds/{sku_a}.pdf", 'Piany'])
+            # Rekord B (Duplikat EAN, inne SKU)
+            sku_b = f'SEL-{1000 + (i*2) + 1}'
+            name_b = f"{name_a} - DUPLIKAT SYSTEMOWY"
+            data.append([sku_b, name_b, ean, 'FR', "25 kg/m3", "", "Unmapped_FR"])
+            i += 1
         else:
-            product_name = base_name if random.random() > 0.3 else f"  {base_name.upper()}  "
+            # Reszta rekordów (unikalne)
+            sku = f'SEL-{2000 + i}'
+            market = random.choice(markets)
+            product_name = f"{random.choice(brands)} {random.choice(['Klej', 'Silikon'])}"
+            ean = f'{random.randint(10**12, 10**13-1)}'
+            url = f"https://selena.com/msds/{sku}.pdf" if random.random() > 0.2 else ""
+            category = "Unmapped_FR" if market == 'FR' else random.choice(categories)
+            data.append([sku, product_name, ean, market, 28, url, category])
+            i += 1
             
-        # EAN i duplikaty
-        if i < 10: ean = duplicate_eans[i]
-        elif i < 20: ean = duplicate_eans[i-10]
-        else: ean = f'{random.randint(10**12, 10**13-1)}'
-            
-        # Gęstość
-        density = f"{random.randint(20, 30)} kg/m3" if market == 'FR' else random.randint(20, 30)
-        
-        # MSDS URL (20% braków)
-        url = f"https://selena.com/msds/{sku}.pdf" if random.random() > 0.2 else ""
-        
-        # --- KLUCZOWA ZMIANA: BŁĄD TAKSONOMICZNY ---
-        if market == 'FR' and "Mousse" in product_name:
-            # Wstawiamy BŁĘDNĄ kategorię w pliku INITIAL, aby pokazać proces mapowania
-            category = "Unmapped_FR" 
-        else:
-            category = random.choice(categories)
-        
-        data.append([sku, product_name, ean, market, density, url, category])
-        
     df = pd.DataFrame(data, columns=['SKU', 'Product_Name', 'EAN', 'Market', 'Density_kg_m3', 'Safety_Sheet_URL', 'Category'])
     df.to_csv('data/selena_legacy_data.csv', index=False)
-    print("Zaktualizowano plik źródłowy z widocznymi błędami taksonomii (Unmapped_FR).")
+    print("Zaktualizowano generator: 10 par duplikatów umieszczono obok siebie (wiersze 0-19).")
 
 if __name__ == "__main__":
     generate_selena_data()
