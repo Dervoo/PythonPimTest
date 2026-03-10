@@ -66,5 +66,15 @@ py scripts/selena_final_fix.py
 py scripts/generate_impact_report.py
 ```
 
+## 🧠 5. Human-in-the-Loop: Rola Ekspercka i Nadzór
+Projekt ten nie jest jedynie zbiorem skryptów – to **synergia automatyzacji i ludzkiego nadzoru**. Jako inicjator i audytor ekosystemu, odegrałem kluczową rolę w:
+
+*   **Projektowaniu Logiki Prezentacji**: To ja wymusiłem strukturę "pary duplikatów obok siebie" w pliku INITIAL, aby umożliwić błyskawiczną weryfikację wzrokową – co jest kluczowe w pracy operacyjnej Data Stewarda.
+*   **Audycie i Korekcie Algorytmów**: Wykryłem i skorygowałem błędy w sortowaniu danych (SKU Alignment), dbając o to, by raporty końcowe były czytelne i spójne z danymi źródłowymi.
+*   **Weryfikacji Taksonomii**: Dopilnowałem, aby błędy systemowe (Unmapped_FR) były ewidentnie wskazane w fazie początkowej, co umożliwiło udowodnienie skuteczności procesów mapowania.
+*   **Wsparciu Ekosystemu**: Moja rola polegała na budowie, testowaniu i ciągłym udoskonalaniu narzędzi (Python/Pandas), tak aby proces był powtarzalny, skalowalny i odporny na błędy ludzkie.
+
+**Wniosek:** Potrafię nie tylko budować zaawansowane narzędzia danych, ale przede wszystkim potrafię nimi **zarządzać i krytycznie oceniać ich wynik**, gwarantując 100% poprawności Master Data.
+
 ---
 **PIM Data Operations Assistant Portfolio** | *Autor: [Twoje Imię i Nazwisko]* | *Technologie: Python, Pandas, SQLite, FPDF*
