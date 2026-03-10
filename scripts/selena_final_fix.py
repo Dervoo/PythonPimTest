@@ -3,7 +3,7 @@ import sqlite3
 import re
 
 # 1. Wczytanie danych wejściowych
-df = pd.read_csv('selena_legacy_data.csv')
+df = pd.read_csv('data/selena_legacy_data.csv')
 
 print(f"Startowa liczba rekordów: {len(df)}")
 
@@ -45,5 +45,5 @@ conn.commit()
 conn.close()
 
 # Zapisanie finalnego pliku CSV
-df_cleaned.to_csv('selena_final_master_data.csv', index=False)
+df_cleaned.to_csv('data/selena_final_master_data.csv', index=False)
 print("Finalna baza Master Data zapisana i wgrana do SQL.")

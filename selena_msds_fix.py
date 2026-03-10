@@ -2,7 +2,7 @@ import pandas as pd
 import sqlite3
 
 # 1. Wczytanie Master Data
-df = pd.read_csv('selena_final_master_data.csv')
+df = pd.read_csv('data/selena_final_master_data.csv')
 
 # --- ZADANIE: Uzupełnienie kart charakterystyki (MSDS) ---
 mask_missing = (df['Safety_Sheet_URL'].isna()) | (df['Safety_Sheet_URL'] == '')
@@ -32,5 +32,5 @@ conn.commit()
 conn.close()
 
 # Zapisanie ostatecznego pliku
-df.to_csv('selena_final_master_data.csv', index=False)
+df.to_csv('data/selena_final_master_data.csv', index=False)
 print("Ostateczna baza Master Data (100% Quality) została zapisana.")
