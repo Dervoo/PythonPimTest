@@ -1,0 +1,73 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Selena FM - PIM Cleaner Specialist\n",
+    "Niniejszy proces demonstruje automatyczne czyszczenie danych po fuzji z francuskim podmiotem ACDIS oraz rynkiem kazachstańskim."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "import re\n",
+    "\n",
+    "df = pd.read_csv('selena_legacy_data.csv')\n",
+    "\n",
+    "# 1. Standaryzacja Nazw\n",
+    "def clean_name(row):\n",
+    "    name = str(row['Product_Name']).strip().upper()\n",
+    "    brand = 'SELENA'\n",
+    "    if 'TYTAN' in name: brand = 'TYTAN PROFESSIONAL'\n",
+    "    elif 'QUILOSA' in name: brand = 'QUILOSA'\n",
+    "    elif 'ARTELIT' in name: brand = 'ARTELIT'\n",
+    "    \n",
+    "    # Proste wyciągnięcie 'Piana', 'Klej', 'Silikon' jako Nazwa\n",
+    "    prod_type = 'CHEMIA'\n",
+    "    if 'PIANA' in name or 'MOUSSE' in name: prod_type = 'Piana'\n",
+    "    elif 'KLEJ' in name: prod_type = 'Klej'\n",
+    "    elif 'SILIKON' in name: prod_type = 'Silikon'\n",
+    "    \n",
+    "    return f\"{brand} - {prod_type}\"\n",
+    "\n",
+    "df['Standardized_Name'] = df.apply(clean_name, axis=1)\n",
+    "\n",
+    "# 2. Konwersja Techniczna (Density)\n",
+    "def extract_density(val):\n",
+    "    if val == 'brak' or pd.isna(val): return 0.0\n",
+    "    match = re.search(r'(\\d+)', str(val))\n",
+    "    return float(match.group(1)) if match else 0.0\n",
+    "\n",
+    "df['Density_kg_m3'] = df['Density_kg_m3'].apply(extract_density)\n",
+    "\n",
+    "# 3. Walidacja Bezpieczeństwa\n",
+    "df['Blocked_for_E-commerce'] = df['Safety_Sheet_URL'].isna() | (df['Safety_Sheet_URL'] == '')\n",
+    "\n",
+    "# 4. Mapowanie Rynków i Taksonomii\n",
+    "mask_fr_mousse = (df['Market'] == 'FR') & (df['Product_Name'].str.contains('Mousse', case=False))\n",
+    "df.loc[mask_fr_mousse, 'Category'] = 'Piany'\n",
+    "\n",
+    "# 5. Raport Niezgodności (Duplikaty EAN o różnych nazwach)\n",
+    "ean_duplicates = df[df.duplicated('EAN', keep=False)].sort_values('EAN')\n",
+    "print(\"RAPORT NIEZGODNOŚCI - DUPLIKATY EAN DO SCALENIA:\")\n",
+    "display(ean_duplicates[['EAN', 'SKU', 'Market', 'Product_Name']].head(10))\n",
+    "\n",
+    "df.to_csv('selena_cleaned_data.csv', index=False)\n",
+    "print(\"Dane oczyszczone i zapisane w 'selena_cleaned_data.csv'\")"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "name": "python3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}
