@@ -55,16 +55,37 @@ Oto bezpośrednie zestawienie bazy danych **Przed** i **Po** mojej interwencji.
 
 ---
 
-## 🚀 Jak to uruchomić?
-```powershell
-# 1. Zainstaluj biblioteki
-py -m pip install pandas fpdf matplotlib openpyxl
+## 🚀 4. Jak to uruchomić?
 
-# 2. Wygeneruj dane i raporty (Uruchom skrypty z folderu scripts/)
+### Krok 1: Instalacja wymaganych bibliotek
+Aby uruchomić pełną analitykę i dashboard, zainstaluj zależności:
+```powershell
+py -m pip install pandas fpdf matplotlib openpyxl streamlit scikit-learn
+```
+
+### Krok 2: Generowanie danych i raportów (Silnik PIM)
+Uruchom skrypty przetwarzające dane:
+```powershell
+py scripts/setup_database.py
 py scripts/generate_selena_data.py
 py scripts/selena_final_fix.py
 py scripts/generate_impact_report.py
 ```
+
+### Krok 3: Interaktywny Dashboard (BI & Live ML)
+Uruchom nowoczesny dashboard z modułem Machine Learning:
+```powershell
+# Jeśli 'streamlit' nie jest w PATH, użyj modułu python:
+py -m streamlit run scripts/streamlit_app.py
+```
+
+---
+
+## 🧠 5. Inteligentny Dashboard (Co znajdziesz w środku?)
+Stworzony dashboard w **Streamlit** to centrum dowodzenia Data Stewarda:
+*   **Live ML Validator**: Model Random Forest, który w czasie rzeczywistym ocenia "Quality Score" nowo wprowadzanych produktów.
+*   **Business Intelligence**: Karty KPI pokazujące gotowość e-commerce i unikalność EAN.
+*   **SQL Explorer**: Możliwość bezpośredniego odpytywania bazy `pim_database.db` z poziomu przeglądarki.
 
 ## 🧠 5. Human-in-the-Loop: Rola Ekspercka i Nadzór
 Projekt ten nie jest jedynie zbiorem skryptów – to **synergia automatyzacji i ludzkiego nadzoru**. Jako inicjator i audytor ekosystemu, odegrałem kluczową rolę w:
