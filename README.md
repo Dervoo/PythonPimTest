@@ -98,4 +98,4 @@ Projekt ten nie jest jedynie zbiorem skryptów – to **synergia automatyzacji i
 **Wniosek:** Potrafię nie tylko budować zaawansowane narzędzia danych, ale przede wszystkim potrafię nimi **zarządzać i krytycznie oceniać ich wynik**, gwarantując 100% poprawności Master Data.
 
 ---
-**PIM Data Operations Assistant Portfolio** | *Autor: [Twoje Imię i Nazwisko]* | *Technologie: Python, Pandas, SQLite, FPDF*
+**PIM Data Operations Assistant Portfolio** | *Autor: Bartosz Osiński* | *Technologie: Python, Pandas, SQLite, FPDF*
