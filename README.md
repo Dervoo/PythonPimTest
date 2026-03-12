@@ -60,14 +60,16 @@ This project demonstrates the process of **product data integration and cleansin
 **[PL]:** Projekt ten jest koronnym dowodem na to, że **sama maszyna ML nie dawała rady** z poprawnym stworzeniem modelu walidacyjnego bez precyzyjnego nadzoru. Dopiero po skonstruowaniu **zaawansowanych instrukcji o wysokiej dokładności**, Gatekeeper zaczął działać zgodnie ze standardami biznesowymi.
 
 *   **⚠️ Przełamanie Ograniczeń ML**: Zaprojektowałem autorską logikę, która wymusza obecność marki Seleny, co wcześniej było pomijane przez automaty.
-*   **💡 Precyzyjna Kalibracja**: Wprowadziłem inteligentne ostrzeżenia (Yellow Alert) dla opcji "Wpisz własną nazwę", balansując elastyczność z jakością.
-*   **Walidacja EAN-13**: Wdrożyłem weryfikację unikalności względem bazy Master Data w czasie rzeczywistym.
+*   **💡 Precyzyjna Kalibracja (Logic Fix)**: Skalibrowałem system punktacji tak, aby produkt bez marki, nazwy, EAN i MSDS otrzymywał **0% Quality Score** (wyeliminowanie "punktów za nic").
+*   **📱 Integracja Mobilna (Tablet Optimization)**: Wdrożyłem pełną responsywność wykresów (`use_container_width`), optymalizując dashboard pod pracę stewardów w terenie na tabletach.
+*   **🔍 UI/UX Validation**: Skorygowałem błędy wizualne w Streamlit – teraz niepoprawny kod EAN jest natychmiast oznaczany czerwonym krzyżykiem (❌) zamiast mylącego zielonego ptaszka.
 
 **[EN]:** This project is ultimate proof that **ML alone was insufficient** to create a proper validation model without precise oversight. Only after constructing **advanced, high-accuracy instructions** did the Gatekeeper meet business standards.
 
 *   **⚠️ Overcoming ML Limits**: I designed custom logic to enforce Selena branding, which was previously overlooked by automated systems.
-*   **💡 Precision Calibration**: I introduced intelligent warnings (Yellow Alerts) for the "Custom Name" option, balancing flexibility with data quality.
-*   **EAN-13 Validation**: Implemented real-time uniqueness verification against the Master Data database.
+*   **💡 Precision Calibration (Logic Fix)**: Calibrated the scoring system so that a product without brand, name, EAN, and MSDS receives **0% Quality Score** (eliminating "points for nothing").
+*   **📱 Mobile Integration (Tablet Optimization)**: Implemented full chart responsiveness (`use_container_width`), optimizing the dashboard for stewards working in the field on tablets.
+*   **🔍 UI/UX Validation**: Corrected visual bugs in Streamlit – incorrect EAN codes are now immediately flagged with a red cross (❌) instead of a misleading green checkmark.
 
 ---
 
