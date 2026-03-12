@@ -25,18 +25,19 @@ class PIMGatekeeper:
         # 1. Walidacja Marki i Dopelnienia (Bez polskich znakow dla PDF)
         if brand is None or brand == "None":
             self.messages.append("Nazwa produktu niekompletna (Brak Marki)")
+            self.quality_score -= 30
             if not complement or complement == "" or complement == "Wybierz":
                 self.messages.append("Uzupelnij nazwe nowego produktu")
                 self.quality_score -= 20
         elif brand in ["Tytan Professional", "Quilosa", "Artelit"]:
             if not complement or complement == "Wybierz" or complement == "":
                 self.messages.append(f"Nie wybrano produktu dla marki {brand}")
-                self.quality_score -= 15
+                self.quality_score -= 30
             else:
                 self.messages.append(f"Sprawdz nazwe nowo wprowadzanego produktu ({brand} {complement})")
         
-        if complement == "Wybierz":
-            if not any("Nie wybrano produktu" in msg for msg in self.messages):
+        if complement == "Wybierz" or not complement:
+            if not any("Nie wybrano produktu" in msg for msg in self.messages) and not any("Uzupelnij nazwe" in msg for msg in self.messages):
                 self.messages.append("Nie wybrano produktu")
                 self.quality_score -= 10
 
@@ -47,14 +48,14 @@ class PIMGatekeeper:
             self.quality_score -= 25
         elif not (len(ean_str) == 13 and ean_str.isdigit()):
             self.messages.append("EAN jest nieprawidlowo wprowadzony")
-            self.quality_score -= 15
+            self.quality_score -= 25
         else:
             self.messages.append("EAN prawidlowo wprowadzony")
 
         # 3. Walidacja MSDS
         if not has_msds or has_msds == "False" or has_msds is False:
             self.messages.append("Brak dokumentacji MSDS")
-            self.quality_score -= 20
+            self.quality_score -= 25
 
         self.quality_score = max(0, self.quality_score)
         
