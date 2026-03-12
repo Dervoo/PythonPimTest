@@ -65,7 +65,7 @@ if app_mode == "Dashboard Biznesowy":
             try:
                 df_prices = pd.read_sql_query("SELECT * FROM View_Price_Analytics", conn)
                 if not df_prices.empty:
-                    st.bar_chart(df_prices.set_index('Category_Name')['Avg_Price'])
+                    st.bar_chart(df_prices.set_index('Category_Name')['Avg_Price'], use_container_width=True)
                 else:
                     st.info("Baza SQL nie zawiera jeszcze danych analitycznych.")
             except:
@@ -74,7 +74,7 @@ if app_mode == "Dashboard Biznesowy":
         
         with col_right:
             st.subheader("Rozklad Produktow per Rynek")
-            st.bar_chart(df_clean['Market'].value_counts())
+            st.bar_chart(df_clean['Market'].value_counts(), use_container_width=True)
             
         st.subheader("Podglad Master Data (Top 50)")
         st.dataframe(df_clean.head(50), use_container_width=True)
@@ -145,6 +145,8 @@ elif app_mode == "PIM Gatekeeper (Validation)":
         for msg in messages:
             if "Brak Marki" in msg and brand_choice == "None" and complement_choice == "Wpisz wlasna nazwe":
                 st.warning(f"⚠️ {msg}")
+            elif "EAN" in msg and ("niepoprawny" in msg.lower() or "cyfr" in msg.lower()):
+                st.error(f"❌ {msg}")
             elif "prawidlowo" in msg.lower() or "Sprawdz" in msg:
                 st.info(f"✅ {msg}")
             else:
