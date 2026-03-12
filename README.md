@@ -83,19 +83,25 @@ py -m streamlit run scripts/streamlit_app.py
 
 ## 🧠 5. Inteligentny Dashboard (Co znajdziesz w środku?)
 Stworzony dashboard w **Streamlit** to centrum dowodzenia Data Stewarda:
-*   **Live ML Validator**: Model Random Forest, który w czasie rzeczywistym ocenia "Quality Score" nowo wprowadzanych produktów.
-*   **Business Intelligence**: Karty KPI pokazujące gotowość e-commerce i unikalność EAN.
-*   **SQL Explorer**: Możliwość bezpośredniego odpytywania bazy `pim_database.db` z poziomu przeglądarki.
-
-## 🧠 5. Human-in-the-Loop: Rola Ekspercka i Nadzór
-Projekt ten nie jest jedynie zbiorem skryptów – to **synergia automatyzacji i ludzkiego nadzoru**. Jako inicjator i audytor ekosystemu, odegrałem kluczową rolę w:
-
-*   **Projektowaniu Logiki Prezentacji**: To ja wymusiłem strukturę "pary duplikatów obok siebie" w pliku INITIAL, aby umożliwić błyskawiczną weryfikację wzrokową – co jest kluczowe w pracy operacyjnej Data Stewarda.
-*   **Audycie i Korekcie Algorytmów**: Wykryłem i skorygowałem błędy w sortowaniu danych (SKU Alignment), dbając o to, by raporty końcowe były czytelne i spójne z danymi źródłowymi.
-*   **Weryfikacji Taksonomii**: Dopilnowałem, aby błędy systemowe (Unmapped_FR) były ewidentnie wskazane w fazie początkowej, co umożliwiło udowodnienie skuteczności procesów mapowania.
-*   **Wsparciu Ekosystemu**: Moja rola polegała na budowie, testowaniu i ciągłym udoskonalaniu narzędzi (Python/Pandas), tak aby proces był powtarzalny, skalowalny i odporny na błędy ludzkie.
-
-**Wniosek:** Potrafię nie tylko budować zaawansowane narzędzia danych, ale przede wszystkim potrafię nimi **zarządzać i krytycznie oceniać ich wynik**, gwarantując 100% poprawności Master Data.
+*   **Verified Entry (Live ML)**: System ekspercki z walidacją sumy kontrolnej EAN-13 i sprawdzaniem unikalności w bazie w czasie rzeczywistym.
+*   **Business Intelligence**: Karty KPI pokazujące gotowość e-commerce, rozkład kategorii i rynków.
+*   **SQL Explorer**: Biblioteka gotowych scenariuszy analitycznych (podatki, braki MSDS, ceny).
 
 ---
-**PIM Data Operations Assistant Portfolio** | *Autor: Bartosz Osiński* | *Technologie: Python, Pandas, SQLite, FPDF*
+
+## 👤 6. Human-in-the-Loop: Rola Ekspercka i Nadzór (Klucz do Sukcesu)
+Projekt ten jest koronnym dowodem na to, że **sama maszyna ML nie dawała rady** z poprawnym stworzeniem modelu walidacyjnego bez precyzyjnego nadzoru. Dopiero po skonstruowaniu **zaawansowanych instrukcji o wysokiej dokładności** i iteracyjnym "dokarmianiu" systemu wiedzą dziedzinową, Gatekeeper zaczął działać zgodnie z rygorystycznymi standardami biznesowymi.
+
+Jako Data Steward i Architekt Systemu, odegrałem kluczową rolę w eliminacji błędów, których algorytmy "pudełkowe" nie potrafiły wychwycić:
+
+*   **⚠️ Przełamanie Ograniczeń ML**: Standardowe modele klasyfikacji nie rozumiały niuansów brandingu Seleny. Musiałem zaprojektować autorską logikę "Gatekeepera", która twardo egzekwuje obecność marki (Tytan, Quilosa, Artelit) i blokuje niekompletne rekordy, co wcześniej było pomijane przez automaty.
+*   **💡 Precyzyjna Kalibracja Komunikatów**: Wprowadziłem inteligentne stopniowanie alertów. Przykład: Gdy użytkownik wybiera opcję "Wpisz własną nazwę" przy braku marki (None), system nie blokuje pracy błędem (Red), lecz wyświetla **ostrzeżenie (Yellow)**. To efekt mojej decyzji biznesowej o zachowaniu elastyczności procesu przy jednoczesnym monitoringu jakości.
+*   **Korekta Logiki Walidacji**: Wykryłem, że pierwotny model błędnie podnosił jakość przy braku dokumentacji MSDS. Wymusiłem rygorystyczną zasadę: "Brak MSDS = Obniżenie Score o 20% i Status Draft".
+*   **Walidacja Matematyczna (EAN-13)**: Zakwestionowałem akceptowanie dowolnych 13 cyfr. Dzięki temu zaimplementowano algorytm weryfikacji unikalności EAN względem bazy Master Data w czasie rzeczywistym.
+*   **Zapewnienie Spójności Danych (PIM Dictionary)**: Zainicjowałem stworzenie dynamicznego słownika dopełnień nazw. Zamiast wolnego tekstu, system wymusza teraz zweryfikowane wzorce, co eliminuje błędy literowe (np. "Pianka" vs "Piana").
+
+**Wniosek:** Projekt pokazuje moją zdolność do **zarządzania AI jako narzędziem**, krytycznej oceny wyników maszynowych i dostarczania technologii, która realnie spełnia wymogi biznesowe dzięki precyzyjnemu "Human Steering".
+
+---
+**PIM Data Operations Assistant Portfolio** | *Autor: Bartosz Osiński | *Technologie: Python, Pandas, SQLite, Streamlit, Scikit-learn*
+

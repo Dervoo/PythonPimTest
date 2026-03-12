@@ -2,12 +2,24 @@ import streamlit as st
 import pandas as pd
 import sqlite3
 import os
-import numpy as np
+import sys
+
+# Dodajemy folder scripts do path, aby moc zaimportowac gatekeepera
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.append(current_dir)
+
+try:
+    from pim_gatekeeper import PIMGatekeeper
+except ImportError:
+    # Fallback dla uruchamiania z roznych poziomow katalogow
+    sys.path.append(os.path.join(os.getcwd(), 'scripts'))
+    from scripts.pim_gatekeeper import PIMGatekeeper
 
 # Konfiguracja strony
-st.set_page_config(page_title="Selena PIM - Master Data Center", layout="wide", page_icon="🏭")
+st.set_page_config(page_title="Selena PIM - Gatekeeper Center", layout="wide", page_icon="🛡️")
 
-# Ścieżki
+# Sciezki
 DB_PATH = 'pim_database.db'
 CLEAN_DATA_CSV = 'data/selena_final_master_data.csv'
 
@@ -20,143 +32,148 @@ def load_clean_data():
         return pd.read_csv(CLEAN_DATA_CSV)
     return pd.DataFrame()
 
-# --- LOGIKA WALIDACJI ---
-
-def get_verified_suffixes(df, brand):
-    if df.empty or brand == "None": return []
-    # Filtrowanie bezpieczne
-    brand_products = df[df['Product_Name'].str.contains(brand, na=False, case=False)]
-    suffixes = [name.replace(brand, "").strip() for name in brand_products['Product_Name']]
-    return sorted(list(set(suffixes)))
-
-def is_ean13_checksum_valid(ean):
-    if not str(ean).isdigit() or len(str(ean)) != 13: return False
-    digits = [int(d) for d in str(ean)]
-    odd_sum = sum(digits[0:12:2])
-    even_sum = sum(digits[1:12:2])
-    total = odd_sum + (even_sum * 3)
-    check_digit = (10 - (total % 10)) % 10
-    return digits[12] == check_digit
+# Inicjalizacja Gatekeepera
+gatekeeper = PIMGatekeeper()
 
 # --- UI ---
-st.title("🏭 Selena PIM - Master Data Control Center")
+st.title("🛡️ SELENA PIM Master Data Control Center")
+st.markdown("### *Inteligentny Walidator PIM Gatekeeper & ML Analysis*")
 
 df_clean = load_clean_data()
-app_mode = st.sidebar.selectbox("Nawigacja", ["Dashboard Biznesowy", "Verified Entry (Live ML)", "Baza PIM (SQL)"])
+app_mode = st.sidebar.selectbox("Nawigacja", ["Dashboard Biznesowy", "PIM Gatekeeper (Validation)", "Baza PIM (SQL)"])
 
 if app_mode == "Dashboard Biznesowy":
-    st.header("📊 Analiza Master Data (Single Source of Truth)")
+    st.header("📊 Dashboard Biznesowy - Analityka Cenowa i Jakosciowa")
     
     if not df_clean.empty:
         # KPI Cards
         c1, c2, c3, c4 = st.columns(4)
         c1.metric("Wszystkie SKU", len(df_clean))
-        c2.metric("E-com Ready", f"{(1 - df_clean['Blocked_for_E-commerce'].mean())*100:.1f}%")
-        c3.metric("Unikalność EAN", f"{df_clean['EAN'].nunique()/len(df_clean)*100:.1f}%")
-        c4.metric("Błędy Taksonomii", "0 (Clean)")
+        msds_rate = df_clean['Has_MSDS'].astype(bool).mean() if 'Has_MSDS' in df_clean.columns else 0
+        c2.metric("E-com Ready (MSDS)", f"{msds_rate*100:.1f}%")
+        
+        avg_price = df_clean['Price'].mean() if 'Price' in df_clean.columns else 0
+        c3.metric("Sredni Price", f"{avg_price:.2f} PLN")
+        c4.metric("Status Bazy", "ZWALIDOWANO")
         
         st.divider()
         col_left, col_right = st.columns([1, 1])
         
         with col_left:
-            st.subheader("Rozkład Kategorii")
-            st.bar_chart(df_clean['Category'].value_counts())
+            st.subheader("Srednie Ceny per Kategoria (Dane SQL)")
+            conn = get_db_connection()
+            try:
+                df_prices = pd.read_sql_query("SELECT * FROM View_Price_Analytics", conn)
+                if not df_prices.empty:
+                    st.bar_chart(df_prices.set_index('Category_Name')['Avg_Price'])
+                else:
+                    st.info("Baza SQL nie zawiera jeszcze danych analitycznych.")
+            except:
+                st.info("Uruchom skrypt update_sql_queries.py, aby aktywowac widoki SQL.")
+            conn.close()
         
         with col_right:
-            st.subheader("Rynek Dystrybucji")
-            # Zmieniono z pie_chart na bar_chart dla lepszej kompatybilności
+            st.subheader("Rozklad Produktow per Rynek")
             st.bar_chart(df_clean['Market'].value_counts())
             
-        st.subheader("Pełna Baza Produktowa")
-        st.dataframe(df_clean, use_container_width=True, height=400)
+        st.subheader("Podglad Master Data (Top 50)")
+        st.dataframe(df_clean.head(50), use_container_width=True)
     else:
-        st.error("Brak danych. Uruchom skrypty PIM.")
+        st.error("Brak danych w data/selena_final_master_data.csv. Uruchom skrypty przygotowujace dane.")
 
-elif app_mode == "Verified Entry (Live ML)":
-    st.header("🧠 Inteligentny Walidator (PIM Gatekeeper)")
+elif app_mode == "PIM Gatekeeper (Validation)":
+    st.header("🧠 Inteligentny Walidator PIM Gatekeeper")
+    st.info("System Machine Learning weryfikuje dane w czasie rzeczywistym zgodnie z instrukcjami Gatekeepera.")
     
-    col1, col2 = st.columns([1, 1])
+    col1, col2 = st.columns([1, 1.2])
     
     with col1:
-        st.subheader("Formularz Nowego Produktu")
-        base_name = st.selectbox("Marka", ["None", "Tytan Professional", "Quilosa", "Artelit"])
+        st.subheader("Wprowadzanie Danych")
+        # Wybor Marki
+        brand_options = ["None", "Tytan Professional", "Quilosa", "Artelit"]
+        brand_choice = st.selectbox("Marka", brand_options)
         
-        verified_suffixes = get_verified_suffixes(df_clean, base_name)
-        suffix_choice = st.selectbox("Dopełnienie (Verified List)", 
-                                     ["--- Wybierz ---", "Inne (Nowy Produkt)"] + verified_suffixes)
+        # Wybor Dopelnienia - Dodano "Wpisz wlasna nazwe" zgodnie z instrukcja
+        complements = ["Wybierz", "Klej do luster", "Piana 65 wysokowydajna", "Silikon Sanitarny", "Klej Montazowy", "Wpisz wlasna nazwe"]
+        complement_choice = st.selectbox("Dopelnienie (Nazwa Produktu)", complements)
         
-        if suffix_choice == "Inne (Nowy Produkt)":
-            suffix = st.text_input("Wpisz Nowe Dopełnienie")
-            is_manual = True
-        else:
-            suffix = suffix_choice if suffix_choice != "--- Wybierz ---" else ""
-            is_manual = False
-            
-        # POPRAWNY EAN DLA TESTÓW (5901234567893)
-        in_ean = st.text_input("Kod EAN-13", "5901234567893")
-        in_msds = st.toggle("Dokumentacja MSDS zweryfikowana", value=True)
+        final_complement = complement_choice
+        # Logika dynamicznego pola tekstowego
+        if complement_choice == "Wpisz wlasna nazwe":
+            final_complement = st.text_input("Wpisz wlasna nazwe produktu", "")
+            if not final_complement:
+                final_complement = "" # To spowoduje obnizenie score przez Gatekeepera
+        
+        # EAN
+        ean_input = st.text_input("Kod EAN (13 cyfr)", value="5901234567893")
+        
+        # MSDS
+        msds_input = st.toggle("Dokumentacja MSDS Dostepna", value=True)
+        
+        st.divider()
+        st.write("**Zasady Gatekeepera:**")
+        st.write("- Wybranie 'Wpisz wlasna nazwe' bez wpisania nazwy obniza score.")
+        st.write("- Marka 'None' zawsze dostaje komunikat o niekompletnej nazwie.")
 
-    # --- ANALIZA SCORE ---
-    issues = []
-    score = 100
+    # --- URUCHOMIENIE WALIDACJI ---
+    validation = gatekeeper.validate_product(
+        brand=brand_choice if brand_choice != "None" else None,
+        complement=final_complement,
+        ean=ean_input,
+        has_msds=msds_input
+    )
     
-    if base_name == "None" or not suffix:
-        score -= 20
-        issues.append("❌ Nazwa produktu niekompletna.")
-    elif is_manual:
-        score -= 10
-        issues.append("ℹ️ Nowy wzorzec nazwy: Wymaga zatwierdzenia przez Lead Stewarda.")
-        
-    if not is_ean13_checksum_valid(in_ean):
-        score -= 50
-        issues.append("❌ BŁĄD MATEMATYCZNY: Niepoprawny EAN-13 (Zła suma kontrolna).")
-    elif str(in_ean) in df_clean['EAN'].astype(str).values:
-        score -= 40
-        issues.append("⚠️ DUPLIKAT: Ten EAN już istnieje w bazie!")
-        
-    if not in_msds:
-        score -= 40
-        issues.append("🚧 BRAK MSDS: Produkt zostanie zablokowany w e-commerce.")
-
-    score = max(0, score)
+    score = validation['quality_score']
+    messages = validation['messages']
 
     with col2:
-        st.subheader("Audyt Jakości AI")
-        color = "green" if score > 85 else "orange" if score > 50 else "red"
-        st.markdown(f"## Quality Score: <span style='color:{color}'>{score}%</span>", unsafe_allow_html=True)
+        st.subheader("Raport Jakosci (AI Audit)")
+        
+        score_color = "#e74c3c" if score < 60 else "#f39c12" if score < 95 else "#27ae60"
+        st.markdown(f"""
+            <div style='background-color:#f0f2f6; padding:20px; border-radius:10px; border-left: 10px solid {score_color};'>
+                <h1 style='color:{score_color}; text-align:center;'>Quality Score: {score}%</h1>
+            </div>
+        """, unsafe_allow_html=True)
         st.progress(score / 100.0)
         
         if score == 100:
-            st.success("💎 **PERFEKCYJNE MASTER DATA**: Produkt gotowy do importu!")
+            st.success("💎 **PERFEKCYJNE MASTER DATA**: Produkt spełnia wszystkie wymogi Gatekeepera!")
             st.balloons()
-        elif score > 85:
-            st.success("✅ **ZATWIERDZONO**: Dane poprawne.")
-        elif score > 50:
-            st.warning("⚠️ **DRAFT**: Popraw błędy lub uzupełnij MSDS.")
-        else:
-            st.error("❌ **REJECTED**: Dane nie spełniają standardów.")
-            
-        for issue in issues: st.write(issue)
+        
+        st.subheader("Komunikaty Gatekeepera:")
+        for msg in messages:
+            if "Brak Marki" in msg and brand_choice == "None" and complement_choice == "Wpisz wlasna nazwe":
+                st.warning(f"⚠️ {msg}")
+            elif "prawidlowo" in msg.lower() or "Sprawdz" in msg:
+                st.info(f"✅ {msg}")
+            else:
+                st.error(f"❌ {msg}")
 
 elif app_mode == "Baza PIM (SQL)":
-    st.header("🔍 Eksplorator SQL")
+    st.header("🔍 Eksplorator Bazy SQL (Nowe Zapytania)")
     
     scenarios = {
-        "--- Wybierz zapytanie ---": "",
-        "1. Raport Podatkowy (Grouped by Tax)": "SELECT c.Category_Name, c.Tax_Rate, COUNT(p.SKU) as Products FROM Products p JOIN Categories c ON p.Category_ID = c.Category_ID GROUP BY c.Category_Name ORDER BY c.Tax_Rate DESC",
-        "2. Produkty bez dokumentacji (Błędy)": "SELECT p.SKU, p.Name, q.Error_Type FROM Products p JOIN Quality_Logs q ON p.SKU = q.SKU",
-        "3. Top 5 najdroższych produktów": "SELECT SKU, Name, Price FROM Products ORDER BY Price DESC LIMIT 5"
+        "--- Wybierz zapytanie analityczne ---": "",
+        "1. Analiza Cenowa (View_Price_Analytics)": "SELECT * FROM View_Price_Analytics",
+        "2. Produkty Premium (View_Premium_Products)": "SELECT * FROM View_Premium_Products",
+        "3. Podsumowanie bledow (View_Quality_Summary)": "SELECT * FROM View_Quality_Summary",
+        "4. Lista Produktow (Top 50)": "SELECT SKU, Name, Price, Category_ID FROM Products LIMIT 50"
     }
     
-    selected_query = st.selectbox("Gotowe Scenariusze", list(scenarios.keys()))
+    selected_query = st.selectbox("Scenariusze Biznesowe", list(scenarios.keys()))
     conn = get_db_connection()
     
-    q_text = scenarios[selected_query] if scenarios[selected_query] else "SELECT * FROM Products LIMIT 10"
-    query = st.text_area("Edytor SQL", q_text, height=150)
+    q_text = scenarios[selected_query] if scenarios[selected_query] else "SELECT * FROM View_Price_Analytics"
+    query = st.text_area("Edytor SQL", q_text, height=120)
     
-    if st.button("Uruchom Analizę"):
+    if st.button("Uruchom SQL"):
         try:
-            st.dataframe(pd.read_sql_query(query, conn), use_container_width=True)
+            res_df = pd.read_sql_query(query, conn)
+            st.dataframe(res_df, use_container_width=True)
+            if "Avg_Price" in res_df.columns and "Category_Name" in res_df.columns:
+                st.subheader("Wizualizacja Cenowa")
+                st.bar_chart(res_df.set_index('Category_Name')['Avg_Price'])
         except Exception as e:
-            st.error(f"Błąd SQL: {e}")
+            st.error(f"Blad SQL: {e}")
     conn.close()
